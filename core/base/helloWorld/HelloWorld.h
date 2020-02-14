@@ -21,6 +21,8 @@
 #include <Debug.h>
 #include <Triangulation.h>
 
+#include <ArrayIterator.h>
+
 namespace ttk {
 
   /**
@@ -59,8 +61,8 @@ namespace ttk {
      */
     template <class dataType,
               class TriangulationType = ttk::AbstractTriangulation>
-    int computeAverages(dataType *outputData,
-                        const dataType *inputData,
+    int computeAverages(RangeHandler<dataType> outputData,
+                        const RangeHandler<dataType> inputData,
                         const TriangulationType *triangulation) const {
       // start global timer
       ttk::Timer globalTimer;

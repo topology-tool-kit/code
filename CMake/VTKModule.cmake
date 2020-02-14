@@ -36,13 +36,11 @@ macro(ttk_add_vtk_module)
       HEADERS
         ${TTK_HEADERS}
       )
-
     vtk_module_link(${TTK_NAME}
       PUBLIC
         ${VTK_LIBRARIES}
         ${TTK_DEPENDS}
       )
-
     install(
       TARGETS
         ${TTK_NAME}

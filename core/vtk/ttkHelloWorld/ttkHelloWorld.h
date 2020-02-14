@@ -31,6 +31,7 @@
 // VTK Includes
 #include <ttkAlgorithm.h>
 #include <ttkTriangulation.h>
+#include <ttkScalarWorker.h>
 
 // TTK Base Includes
 #include <HelloWorld.h>
@@ -89,4 +90,27 @@ protected:
   int RequestData(vtkInformation *request,
                   vtkInformationVector **inputVector,
                   vtkInformationVector *outputVector) override;
+
+  /**
+   * Here you call the basecode
+   * You need to implement a templated Compute
+   * method that recieve the input and output arrays.
+   * You can need to use GetRange to transform these vtk
+   * arrays into generic range for TTK.
+   * You can also access the triangulation here as well
+   * as the baseClass.
+   */
+  struct HelloWorldWorker
+    : public ScalarWorker<HelloWorldWorker, ttkHelloWorld> {
+    using ScalarWorker::GetRange;
+    using ScalarWorker::ScalarWorker;
+    using ScalarWorker::operator();
+
+    template <typename ArrayType1, typename ArrayType2>
+    void Compute(ArrayType1 *input, ArrayType2 *output) {
+      auto inputRange = GetRange(input);
+      auto outputRange = GetRange(output);
+      baseClass->computeAverages(outputRange, inputRange, triangulation->getData());
+    }
+  };
 };

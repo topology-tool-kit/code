@@ -1,5 +1,6 @@
 #include <ttkHelloWorld.h>
 
+#include <vtkArrayDispatch.txx>
 #include <vtkDataObject.h> // For port information
 #include <vtkObjectFactory.h> // for new macro
 
@@ -7,6 +8,9 @@
 #include <vtkDataSet.h>
 #include <vtkPointData.h>
 #include <vtkSmartPointer.h>
+
+#include "HelloWorld.h"
+#include "Triangulation.h"
 
 // A VTK macro that enables the instantiation of this class via ::New()
 // You do not have to modify this
@@ -155,18 +159,14 @@ int ttkHelloWorld::RequestData(vtkInformation *request,
   // Precondition the triangulation (e.g., enable fetching of vertex neighbors)
   this->preconditionTriangulation(triangulation); // implemented in base class
 
-  // Templatize over the different input array data types and call the base code
-  int status = 0; // this integer checks if the base code returns an error
-  ttkVtkTemplateMacro(triangulation->getType(), inputArray->GetDataType(),
-                      (status = this->computeAverages<VTK_TT, TTK_TT>(
-                         (VTK_TT *)outputArray->GetVoidPointer(0),
-                         (VTK_TT *)inputArray->GetVoidPointer(0),
-                         (TTK_TT *)triangulation->getData())));
-
-  // On error cancel filter execution
-  if(status == 0)
+  // Call the base code computation using the right vtk Dispatch
+  HelloWorldWorker scalarWorker(this, triangulation);
+  if(!vtkArrayDispatch::Dispatch2BySameValueType<
+       vtkArrayDispatch::AllTypes>::Execute(inputArray, outputArray,
+                                            scalarWorker)) {
+    std::cerr << "Bad array type" << std::endl;
     return 0;
-
+  }
   // Get output vtkDataSet (which was already instantiated based on the
   // information provided by FillOutputPortInformation)
   vtkDataSet *outputDataSet = vtkDataSet::GetData(outputVector, 0);
