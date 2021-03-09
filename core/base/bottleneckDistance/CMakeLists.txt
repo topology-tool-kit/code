@@ -11,4 +11,5 @@ ttk_add_base_library(bottleneckDistance
     MatchingGraph.h
   DEPENDS
     triangulation
+    persistenceDiagram
     )

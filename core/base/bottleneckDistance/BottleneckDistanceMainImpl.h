@@ -1,5 +1,10 @@
 #pragma once
 
+#include "BottleneckDistance.h"
+
+namespace ttk {
+
+
 //  vector <   -- diagram
 //    tuple <    -- pair of critical points
 //      int , NodeType
@@ -10,7 +15,6 @@
 //      float, float, float -- vertex 1 coordinates
 //      dataType            -- scalar value at vertex 2
 //      float, float, float -- vertex 2 coordinates
-template <typename dataType>
 int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
                                           const std::vector<diagramTuple> &d2,
                                           std::vector<matchingTuple> &matchings,
@@ -38,7 +42,7 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
     return -4;
 
   // Needed to limit computation time.
-  const dataType zeroThresh = this->computeMinimumRelevantPersistence<dataType>(
+  const dataType zeroThresh = this->computeMinimumRelevantPersistence(
     CTDiagram1, CTDiagram2, d1Size, d2Size);
 
   // Initialize solvers.
@@ -95,8 +99,8 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
     distanceFunction
     = [wasserstein, px, py, pz, pe, ps](
         const diagramTuple a, const diagramTuple b) -> dataType {
-    BNodeType ta1 = std::get<1>(a);
-    BNodeType ta2 = std::get<3>(a);
+    BNodeType ta1 = a.birthType;
+    BNodeType ta2 = a.deathType;
     const int w = wasserstein > 1 ? wasserstein : 1; // L_inf not managed.
 
     // We don't match critical points of different index.
@@ -107,34 +111,34 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
     bool isMax1 = ta2 == BLocalMax;
     // bool isBoth = isMin1 && isMax1;
 
-    dataType rX = std::get<6>(a);
-    dataType rY = std::get<10>(a);
-    dataType cX = std::get<6>(b);
-    dataType cY = std::get<10>(b);
+    dataType rX = a.birthPoint.val;
+    dataType rY = a.deathPoint.val;
+    dataType cX = b.birthPoint.val;
+    dataType cY = b.deathPoint.val;
     dataType x = ((isMin1 && !isMax1) ? pe : ps)
                  * Geometry::pow(abs_diff<dataType>(rX, cX), w);
     dataType y
       = (isMax1 ? pe : ps) * Geometry::pow(abs_diff<dataType>(rY, cY), w);
     double geoDistance
       = isMax1
-          ? (px * Geometry::pow(abs(std::get<11>(a) - std::get<11>(b)), w)
-             + py * Geometry::pow(abs(std::get<12>(a) - std::get<12>(b)), w)
-             + pz * Geometry::pow(abs(std::get<13>(a) - std::get<13>(b)), w))
+          ? (px * Geometry::pow(abs(a.deathPoint.x - b.deathPoint.x), w)
+             + py * Geometry::pow(abs(a.deathPoint.y - b.deathPoint.y), w)
+             + pz * Geometry::pow(abs(a.deathPoint.z - b.deathPoint.z), w))
         : isMin1
-          ? (px * Geometry::pow(abs(std::get<7>(a) - std::get<7>(b)), w)
-             + py * Geometry::pow(abs(std::get<8>(a) - std::get<8>(b)), w)
-             + pz * Geometry::pow(abs(std::get<9>(a) - std::get<9>(b)), w))
+          ? (px * Geometry::pow(abs(a.birthPoint.x - b.birthPoint.x), w)
+             + py * Geometry::pow(abs(a.birthPoint.y - b.birthPoint.y), w)
+             + pz * Geometry::pow(abs(a.birthPoint.z - b.birthPoint.z), w))
           : (px
-               * Geometry::pow(abs(std::get<7>(a) + std::get<11>(a)) / 2
-                                 - abs(std::get<7>(b) + std::get<11>(b)) / 2,
+               * Geometry::pow(abs(a.birthPoint.x + a.deathPoint.x) / 2
+                                 - abs(b.birthPoint.x + b.deathPoint.x) / 2,
                                w)
              + py
-                 * Geometry::pow(abs(std::get<8>(a) + std::get<12>(a)) / 2
-                                   - abs(std::get<8>(b) + std::get<12>(b)) / 2,
+                 * Geometry::pow(abs(a.birthPoint.y + a.deathPoint.y) / 2
+                                   - abs(b.birthPoint.y + b.deathPoint.y) / 2,
                                  w)
              + pz
-                 * Geometry::pow(abs(std::get<9>(a) + std::get<13>(a)) / 2
-                                   - abs(std::get<9>(b) + std::get<13>(b)) / 2,
+                 * Geometry::pow(abs(a.birthPoint.z + a.deathPoint.z) / 2
+                                   - abs(b.birthPoint.z + b.deathPoint.z) / 2,
                                  w));
 
     double persDistance = x + y;
@@ -145,20 +149,20 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
 
   std::function<dataType(const diagramTuple)> diagonalDistanceFunction
     = [wasserstein, px, py, pz, ps, pe](const diagramTuple a) -> dataType {
-    BNodeType ta1 = std::get<1>(a);
-    BNodeType ta2 = std::get<3>(a);
+    BNodeType ta1 = a.birthType;
+    BNodeType ta2 = a.deathType;
     const int w = wasserstein > 1 ? wasserstein : 1;
     bool isMin1 = ta1 == BLocalMin;
     bool isMax1 = ta2 == BLocalMax;
 
-    dataType rX = std::get<6>(a);
-    dataType rY = std::get<10>(a);
-    double x1 = std::get<7>(a);
-    double y1 = std::get<8>(a);
-    double z1 = std::get<9>(a);
-    double x2 = std::get<11>(a);
-    double y2 = std::get<12>(a);
-    double z2 = std::get<13>(a);
+    dataType rX = a.birthPoint.val;
+    dataType rY = a.deathPoint.val;
+    double x1 = a.birthPoint.x;
+    double y1 = a.birthPoint.y;
+    double z1 = a.birthPoint.z;
+    double x2 = a.deathPoint.x;
+    double y2 = a.deathPoint.y;
+    double z2 = a.deathPoint.z;
 
     double infDistance = (isMin1 || isMax1 ? pe : ps)
                          * Geometry::pow(abs_diff<dataType>(rX, rY), w);
@@ -238,17 +242,17 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
   // Rebuild mappings.
   // Begin cost computation for unpaired vertices.
   // std::cout << "Min" << std::endl;
-  dataType addedMinPersistence = this->buildMappings<dataType>(
+  dataType addedMinPersistence = this->buildMappings(
     minMatchings, transposeOriginal, transposeMin, matchings, minMap1, minMap2,
     wasserstein);
 
   // std::cout << "Max" << std::endl;
-  dataType addedMaxPersistence = this->buildMappings<dataType>(
+  dataType addedMaxPersistence = this->buildMappings(
     maxMatchings, transposeOriginal, transposeMax, matchings, maxMap1, maxMap2,
     wasserstein);
 
   // std::cout << "Sad" << std::endl;
-  dataType addedSadPersistence = this->buildMappings<dataType>(
+  dataType addedSadPersistence = this->buildMappings(
     sadMatchings, transposeOriginal, transposeSad, matchings, sadMap1, sadMap2,
     wasserstein);
 
@@ -271,8 +275,8 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
 
     diagramTuple t1 = CTDiagram1[i];
     diagramTuple t2 = CTDiagram2[j];
-    // dataType rX = std::get<6>(t1); dataType rY = std::get<10>(t1);
-    // dataType cX = std::get<6>(t2); dataType cY = std::get<10>(t2);
+    // dataType rX = t1.birthPoint.val; dataType rY = t1.deathPoint.val;
+    // dataType cX = t2.birthPoint.val; dataType cY = t2.deathPoint.val;
     // dataType x = rX - cX; dataType y = rY - cY;
     paired1[i] = true;
     paired2[j] = true;
@@ -318,3 +322,5 @@ int BottleneckDistance::computeBottleneck(const std::vector<diagramTuple> &d1,
   distance_ = (double)d;
   return 0;
 }
+
+} // namespace ttk

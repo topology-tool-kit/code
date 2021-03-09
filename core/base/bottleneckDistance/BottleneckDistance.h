@@ -3,16 +3,6 @@
 /// \author Maxime Soler <soler.maxime@total.com>
 #pragma once
 
-#ifndef diagramTuple
-#define diagramTuple                                                        \
-  std::tuple<int, ttk::CriticalType, int, ttk::CriticalType, dataType, int, \
-             dataType, float, float, float, dataType, float, float, float>
-#endif
-
-#ifndef matchingTuple
-#define matchingTuple std::tuple<int, int, double>
-#endif
-
 #ifndef BNodeType
 #define BNodeType ttk::CriticalType
 #define BLocalMax ttk::CriticalType::Local_maximum
@@ -31,6 +21,31 @@
 #include <string>
 #include <tuple>
 
+#include <PersistenceDiagram.h>
+
+typedef double dataType;
+typedef std::tuple<int, ttk::CriticalType, int, ttk::CriticalType, dataType, int, dataType, float, float, float, dataType, float, float, float> diagramTupleOld;
+
+namespace ttk {
+  struct DecoratedDiagramTuple : public ttk::PersistencePair
+  {
+    DecoratedDiagramTuple(diagramTupleOld t) :
+      ttk::PersistencePair(std::get<0>(t), std::get<1>(t), std::get<2>(t), std::get<3>(t), std::get<4>(t), std::get<5>(t)), birthPoint(std::get<6>(t),std::get<7>(t),std::get<8>(t), std::get<9>(t)), deathPoint(std::get<10>(t),std::get<11>(t),std::get<12>(t), std::get<13>(t))
+    {}
+    DecoratedDiagramTuple() : DecoratedDiagramTuple(diagramTupleOld()) {} 
+    struct Coord { float x, y, z; };
+    struct DataPoint : public Coord {
+      DataPoint(dataType _v, float _x, float _y, float _z) : Coord({_x,_y,_z}),val(_v) {}
+      DataPoint() = default;
+      dataType val;
+    };
+    DataPoint birthPoint, deathPoint;
+  };
+  
+} // namespace ttk
+
+using diagramTuple = ttk::DecoratedDiagramTuple;
+
 namespace ttk {
 
   using trackingTuple = std::tuple<int, int, std::vector<int>>;
@@ -46,7 +61,6 @@ namespace ttk {
 
     ~BottleneckDistance(){};
 
-    template <typename dataType>
     int execute(bool usePersistenceMetric);
 
     inline int setPersistencePercentThreshold(double t) {
@@ -142,26 +156,22 @@ namespace ttk {
     double ps_;
 
   private:
-    template <typename dataType>
     int computeBottleneck(const std::vector<diagramTuple> &d1,
                           const std::vector<diagramTuple> &d2,
                           std::vector<matchingTuple> &matchings,
                           bool usePersistenceMetric);
 
-    template <typename dataType>
     double computeGeometricalRange(const std::vector<diagramTuple> &CTDiagram1,
                                    const std::vector<diagramTuple> &CTDiagram2,
                                    int d1Size,
                                    int d2Size) const;
 
-    template <typename dataType>
     double computeMinimumRelevantPersistence(
       const std::vector<diagramTuple> &CTDiagram1,
       const std::vector<diagramTuple> &CTDiagram2,
       int d1Size,
       int d2Size) const;
 
-    template <typename dataType>
     void computeMinMaxSaddleNumberAndMapping(
       const std::vector<diagramTuple> &CTDiagram,
       int dSize,
@@ -173,7 +183,6 @@ namespace ttk {
       std::vector<int> &sadMap,
       dataType zeroThresh);
 
-    template <typename dataType>
     void buildCostMatrices(
       const std::vector<diagramTuple> &CTDiagram1,
       const std::vector<diagramTuple> &CTDiagram2,
@@ -191,14 +200,12 @@ namespace ttk {
       bool reverseSad,
       int wasserstein);
 
-    template <typename dataType>
     void solvePWasserstein(int nbRow,
                            int nbCol,
                            std::vector<std::vector<dataType>> &matrix,
                            std::vector<matchingTuple> &matchings,
                            Munkres &solver);
 
-    template <typename dataType>
     void solveInfinityWasserstein(int nbRow,
                                   int nbCol,
                                   int nbRowToCut,
@@ -207,7 +214,6 @@ namespace ttk {
                                   std::vector<matchingTuple> &matchings,
                                   GabowTarjan &solver);
 
-    template <typename dataType>
     dataType buildMappings(const std::vector<matchingTuple> &inputMatchings,
                            bool transposeGlobal,
                            bool transposeLocal,
@@ -217,8 +223,5 @@ namespace ttk {
                            int wasserstein);
   };
 
-// Include in namespace ttk
-#include <BottleneckDistanceImpl.h>
-#include <BottleneckDistanceMainImpl.h>
-
 } // namespace ttk
+

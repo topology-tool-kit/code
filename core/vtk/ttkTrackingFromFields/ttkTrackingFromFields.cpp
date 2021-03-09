@@ -63,7 +63,7 @@ int ttkTrackingFromFields::trackWithPersistenceMatching(
 
   ttk::TrackingFromPersistenceDiagrams tfp{};
   tfp.setThreadNumber(this->threadNumber_);
-  tfp.performMatchings<dataType>(
+  tfp.performMatchings(
     (int)fieldNumber, persistenceDiagrams, outputMatchings,
     algorithm, // Not from paraview, from enclosing tracking plugin
     wasserstein, tolerance, is3D,
@@ -74,6 +74,7 @@ int ttkTrackingFromFields::trackWithPersistenceMatching(
   vtkNew<vtkPoints> points{};
   vtkNew<vtkUnstructuredGrid> persistenceDiagram{};
 
+  vtkNew<vtkDoubleArray> costScalars{};
   vtkNew<vtkDoubleArray> persistenceScalars{};
   vtkNew<vtkDoubleArray> valueScalars{};
   vtkNew<vtkIntArray> matchingIdScalars{};
@@ -82,7 +83,8 @@ int ttkTrackingFromFields::trackWithPersistenceMatching(
   vtkNew<vtkIntArray> componentIds{};
   vtkNew<vtkIntArray> pointTypeScalars{};
 
-  persistenceScalars->SetName("Cost");
+  costScalars->SetName("Cost");
+  persistenceScalars->SetName("Persistence");
   valueScalars->SetName("Scalar");
   matchingIdScalars->SetName("MatchingIdentifier");
   lengthScalars->SetName("ComponentLength");
@@ -92,24 +94,24 @@ int ttkTrackingFromFields::trackWithPersistenceMatching(
 
   // (+ vertex id)
   std::vector<trackingTuple> trackingsBase;
-  tfp.performTracking<dataType>(
+  tfp.performTracking(
     persistenceDiagrams, outputMatchings, trackingsBase);
 
   std::vector<std::set<int>> trackingTupleToMerged(
     trackingsBase.size(), std::set<int>());
 
   if(DoPostProc) {
-    tfp.performPostProcess<dataType>(persistenceDiagrams, trackingsBase,
+    tfp.performPostProcess(persistenceDiagrams, trackingsBase,
                                      trackingTupleToMerged, PostProcThresh);
   }
 
   bool useGeometricSpacing = UseGeometricSpacing;
 
   // Build mesh.
-  ttkTrackingFromPersistenceDiagrams::buildMesh<dataType>(
+  ttkTrackingFromPersistenceDiagrams::buildMesh(
     trackingsBase, outputMatchings, persistenceDiagrams, useGeometricSpacing,
     spacing, DoPostProc, trackingTupleToMerged, points, persistenceDiagram,
-    persistenceScalars, valueScalars, matchingIdScalars, lengthScalars,
+    costScalars, persistenceScalars, valueScalars, matchingIdScalars, lengthScalars,
     timeScalars, componentIds, pointTypeScalars);
 
   output->ShallowCopy(persistenceDiagram);

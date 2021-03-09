@@ -9,6 +9,8 @@
 #include <iostream>
 #include <limits>
 
+typedef double dataType;
+
 namespace ttk {
 
   class Munkres : public Debug {
@@ -20,10 +22,8 @@ namespace ttk {
 
     ~Munkres(){};
 
-    template <typename dataType>
     int run(std::vector<matchingTuple> &matchings);
 
-    template <typename dataType>
     inline void clear() {
       pathCount = 0;
       rowSize = 0;
@@ -31,7 +31,6 @@ namespace ttk {
       createdZeros.clear();
     }
 
-    template <typename dataType>
     inline void clearMatrix() {
       std::vector<std::vector<dataType>> C
         = *((std::vector<std::vector<dataType>> *)Cptr);
@@ -73,7 +72,6 @@ namespace ttk {
       return 0;
     }
 
-    template <typename dataType>
     inline void showCostMatrix() {
       auto C = (std::vector<std::vector<dataType>> *)Cptr;
       std::stringstream msg;
@@ -129,43 +127,29 @@ namespace ttk {
     int colSize = 0;
 
     // internal methods
-    template <typename dataType>
     int stepOne(int &step);
 
-    template <typename dataType>
     int stepTwo(int &step);
 
-    template <typename dataType>
     int stepThree(int &step);
 
-    template <typename dataType>
     int stepFour(int &step);
-    template <typename dataType>
     int findZero(int &row, int &col);
-    template <typename dataType>
     int findStarInRow(int row);
 
-    template <typename dataType>
     int stepFive(int &step);
-    template <typename dataType>
     int findStarInCol(int col);
-    template <typename dataType>
     int findPrimeInRow(int row);
 
-    template <typename dataType>
     int stepSix(int &step);
 
-    template <typename dataType>
     int stepSeven(int &step);
 
-    template <typename dataType>
     int affect(std::vector<matchingTuple> &matchings,
                const std::vector<std::vector<dataType>> &C);
 
-    template <typename dataType>
     int computeAffectationCost(const std::vector<std::vector<dataType>> &C);
 
-    template <typename dataType>
     inline bool isZero(dataType t) {
       // return std::abs((double) t) < 1e-15;
       return t == 0.;
@@ -182,7 +166,6 @@ namespace ttk {
       return 0;
     }
 
-    template <typename dataType>
     inline int copyInputMatrix(std::vector<std::vector<dataType>> &saveInput) {
       auto C = (std::vector<std::vector<dataType>> *)Cptr;
       int rS = rowSize;
@@ -195,8 +178,5 @@ namespace ttk {
       return 0;
     }
   };
-
-// Include in namespace ttk
-#include <MunkresImpl.h>
 
 } // namespace ttk

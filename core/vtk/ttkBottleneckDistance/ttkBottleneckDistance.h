@@ -91,17 +91,14 @@ public:
                   vtkInformationVector *outputVector) override;
 
   // Warn: this is duplicated in ttkTrackingFromPersistenceDiagrams
-  template <typename dataType>
   int getPersistenceDiagram(std::vector<diagramTuple> &diagram,
                             vtkUnstructuredGrid *const CTPersistenceDiagram_,
                             double spacing,
                             int diagramNumber);
 
-  template <typename dataType>
   int generatePersistenceDiagram(std::vector<diagramTuple> &diagram, int size);
 
   // Warn: this is duplicated in ttkTrackingFromPersistenceDiagrams
-  template <typename dataType>
   int augmentPersistenceDiagrams(
     const std::vector<diagramTuple> &diagram1,
     const std::vector<diagramTuple> &diagram2,
@@ -109,10 +106,8 @@ public:
     vtkUnstructuredGrid *const CTPersistenceDiagram1_,
     vtkUnstructuredGrid *const CTPersistenceDiagram2_);
 
-  template <typename dataType>
   int translateSecondDiagram(vtkUnstructuredGrid *outputCT2, double &spacing);
 
-  template <typename dataType>
   int getMatchingMesh(vtkUnstructuredGrid *const outputCT3,
                       const std::vector<diagramTuple> &diagram1,
                       const std::vector<diagramTuple> &diagram2,

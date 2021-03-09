@@ -8,6 +8,8 @@
 #include <queue>
 #include <vector>
 
+typedef std::tuple<int, int, double> matchingTuple;
+
 namespace ttk {
 
   class GabowTarjan : public Debug {
@@ -20,20 +22,16 @@ namespace ttk {
     ~GabowTarjan() {
     }
 
-    template <typename dataType>
-    dataType Distance(dataType maxLevel);
+    double Distance(double maxLevel);
 
-    template <typename dataType>
     void printCurrentMatching();
 
-    template <typename dataType>
     int run(std::vector<matchingTuple> &matchings);
 
-    template <typename dataType>
     inline void setInput(int rowSize_, int colSize_, void *C_) {
       Cptr = C_;
 
-      auto C = (std::vector<std::vector<dataType>> *)Cptr;
+      auto C = (std::vector<std::vector<double>> *)Cptr;
       Size1 = (unsigned int)rowSize_ - 1;
       Size2 = (unsigned int)colSize_ - 1;
       if(Size1 <= 0 || Size2 <= 0) {
@@ -71,7 +69,6 @@ namespace ttk {
       std::sort(Edges.begin(), Edges.end());
     }
 
-    template <typename dataType>
     inline void clear() {
       MaxSize = 0;
       Size1 = 0;
@@ -123,18 +120,12 @@ namespace ttk {
      */
     std::vector<int> Layers;
 
-    template <typename dataType>
     bool DFS(int v);
 
-    template <typename dataType>
     bool BFS();
 
     // Hopcroft-Karp algorithm: find a maximal matching
-    template <typename dataType>
     void HopcroftKarp(unsigned int &matching);
   };
-
-// Namespace ttk
-#include <GabowTarjanImpl.h>
 
 } // namespace ttk

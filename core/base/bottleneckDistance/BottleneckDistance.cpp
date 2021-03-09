@@ -1,1 +1,5 @@
 #include "BottleneckDistance.h"
+#include "BottleneckDistanceImpl.h"
+#include "BottleneckDistanceMainImpl.h"
+#include "MunkresImpl.h"
+#include "GabowTarjanImpl.h"
