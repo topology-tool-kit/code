@@ -48,12 +48,14 @@
 
 // TTK includes
 #include <PlanarGraphLayout.h>
+#include <vtkUnstructuredGrid.h>
 
 class TTKPLANARGRAPHLAYOUT_EXPORT ttkPlanarGraphLayout
   : public ttkAlgorithm,
     protected ttk::PlanarGraphLayout {
 
 private:
+  // --- Graph Planar Layout
   // optional field data
   bool UseSequences{false};
   bool UseSizes{false};
@@ -63,7 +65,17 @@ private:
   // output field name
   std::string OutputArrayName{"Layout"};
 
+  // --- Merge Tree Planar Layout
+  bool InputIsAMergeTree = false;
+  bool BranchDecompositionPlanarLayout = false;
+  double BranchSpacing = 1.;
+  double ImportantPairs = 10.; // important pairs threshold
+  double ImportantPairsSpacing = 1.;
+  double NonImportantPairsSpacing = 0.1;
+  double NonImportantPairsProximity = 0.05;
+
 public:
+  // --- Graph Planar Layout
   // getters and setters for optional arrays
   vtkSetMacro(UseSequences, bool);
   vtkGetMacro(UseSequences, bool);
@@ -81,6 +93,29 @@ public:
   vtkSetMacro(OutputArrayName, const std::string &);
   vtkGetMacro(OutputArrayName, std::string);
 
+  // --- Merge Tree Planar Layout
+  vtkSetMacro(InputIsAMergeTree, bool);
+  vtkGetMacro(InputIsAMergeTree, bool);
+
+  vtkSetMacro(BranchDecompositionPlanarLayout, bool);
+  vtkGetMacro(BranchDecompositionPlanarLayout, bool);
+
+  vtkSetMacro(BranchSpacing, double);
+  vtkGetMacro(BranchSpacing, double);
+
+  vtkSetMacro(ImportantPairs, double);
+  vtkGetMacro(ImportantPairs, double);
+
+  vtkSetMacro(ImportantPairsSpacing, double);
+  vtkGetMacro(ImportantPairsSpacing, double);
+
+  vtkSetMacro(NonImportantPairsSpacing, double);
+  vtkGetMacro(NonImportantPairsSpacing, double);
+
+  vtkSetMacro(NonImportantPairsProximity, double);
+  vtkGetMacro(NonImportantPairsProximity, double);
+
+  // ---
   static ttkPlanarGraphLayout *New();
   vtkTypeMacro(ttkPlanarGraphLayout, ttkAlgorithm);
 
@@ -93,4 +128,16 @@ protected:
   int RequestData(vtkInformation *request,
                   vtkInformationVector **inputVector,
                   vtkInformationVector *outputVector) override;
+
+  int planarGraphLayoutCall(vtkInformation *request,
+                            vtkInformationVector **inputVector,
+                            vtkInformationVector *outputVector);
+  int mergeTreePlanarLayoutCall(vtkInformation *request,
+                                vtkInformationVector **inputVector,
+                                vtkInformationVector *outputVector);
+
+  template <class dataType>
+  int mergeTreePlanarLayoutCallTemplate(vtkUnstructuredGrid *treeNodes,
+                                        vtkUnstructuredGrid *treeArcs,
+                                        vtkUnstructuredGrid *output);
 };

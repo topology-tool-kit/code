@@ -4,6 +4,7 @@ ttk_add_base_library(ftmTree
     FTMTree_CT.cpp
     FTMTree_MT.cpp
     FTMSegmentation.cpp
+    FTMTreeUtils.cpp
   HEADERS
     FTMAtomicUF.h
     FTMAtomicVector.h
@@ -18,6 +19,7 @@ ttk_add_base_library(ftmTree
     FTMSegmentation.h
     FTMStructures.h
     FTMSuperArc.h
+    FTMTreeUtils_Template.h
   DEPENDS
     triangulation
     geometry

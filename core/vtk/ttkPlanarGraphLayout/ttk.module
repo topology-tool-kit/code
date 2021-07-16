@@ -4,6 +4,9 @@ SOURCES
   ttkPlanarGraphLayout.cpp
 HEADERS
   ttkPlanarGraphLayout.h
+  ttkMergeTreeVisualization.h
 DEPENDS
   planarGraphLayout
   ttkAlgorithm
+  ttkFTMTree
+  ftmTreePP

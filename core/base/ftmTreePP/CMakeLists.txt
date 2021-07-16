@@ -3,6 +3,7 @@ ttk_add_base_library(ftmTreePP
     FTMTreePP.cpp
   HEADERS
     FTMTreePP.h
+    FTMTreePPUtils.h
   DEPENDS
     ftmTree
     geometry

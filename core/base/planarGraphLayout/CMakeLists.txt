@@ -3,8 +3,10 @@ ttk_add_base_library(planarGraphLayout
     PlanarGraphLayout.cpp
   HEADERS
     PlanarGraphLayout.h
+    MergeTreeVisualization.h
   DEPENDS
     common
+    ftmTree
 )
 
 if (TTK_ENABLE_GRAPHVIZ AND Graphviz_FOUND)

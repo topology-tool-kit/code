@@ -5,6 +5,7 @@ SOURCES
 HEADERS
   ttkFTMTree.h
   ttkFTMStructures.h
+  ttkFTMTreeUtils.h
 DEPENDS
   ftmTree
   ttkAlgorithm

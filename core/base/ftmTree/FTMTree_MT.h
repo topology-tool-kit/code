@@ -586,6 +586,75 @@ namespace ttk {
                     SimplexId nbScalars = -1,
                     const int debugLevel = 2) const;
 
+      // ----------------------------------------
+      // Utils functions
+      // Mathieu Pont (mathieu.pont@lip6.fr)
+      // 2021
+      // ----------------------------------------
+
+      // --------------------
+      // Is
+      // --------------------
+
+      bool isNodeOriginDefined(idNode nodeId);
+
+      bool isRoot(idNode nodeId);
+
+      bool isLeaf(idNode nodeId);
+
+      bool isNodeAlone(idNode nodeId);
+
+      bool isFullMerge();
+
+      bool isBranchOrigin(idNode nodeId);
+
+      template <class dataType>
+      bool isJoinTree();
+
+      template <class dataType>
+      bool isImportantPair(idNode nodeId, double threshold);
+
+      // --------------------
+      // Get
+      // --------------------
+
+      idNode getRoot();
+
+      idNode getParentSafe(idNode nodeId);
+
+      std::vector<idNode> getChildren(idNode nodeId);
+
+      std::vector<idNode> getLeavesFromTree();
+
+      int getNumberOfLeavesFromTree();
+
+      int getNumberOfNodeAlone();
+
+      int getRealNumberOfNodes();
+
+      std::tuple<std::vector<idNode>, std::vector<idNode>>
+        getBranchOriginsFromThisBranch(idNode node);
+
+      void getTreeBranching(std::vector<idNode> &branching,
+                            std::vector<int> &branchingID,
+                            std::vector<std::vector<idNode>> &nodeBranching);
+
+      void getTreeBranching(std::vector<idNode> &branching,
+                            std::vector<int> &branchingID);
+
+      template <class dataType>
+      std::tuple<dataType, dataType> getBirthDeath(idNode nodeId);
+
+      template <class dataType>
+      dataType getBirth(idNode nodeId);
+
+      template <class dataType>
+      dataType getNodePersistence(idNode nodeId);
+
+      // ----------------------------------------
+      // End of utils functions
+      // ----------------------------------------
+
     protected:
       // -----
       // Tools
@@ -676,14 +745,26 @@ namespace ttk {
           (*vect)[i] = val;
         }
       }
-    };
+    }; // end of FTMTree_MT class
 
     std::ostream &operator<<(std::ostream &o, Node const &n);
     std::ostream &operator<<(std::ostream &o, SuperArc const &a);
 
+    struct MergeTree {
+      ftm::Scalars scalars;
+      ftm::Params params;
+      ftm::FTMTree_MT tree;
+      MergeTree(ftm::Scalars scalarsT, ftm::Params paramsT)
+        : scalars(scalarsT), params(paramsT),
+          tree(&params, &scalars, params.treeType) {
+        tree.makeAlloc();
+      }
+    };
+
   } // namespace ftm
 } // namespace ttk
 
+#include <FTMTreeUtils_Template.h>
 #include <FTMTree_MT_Template.h>
 
 #endif /* end of include guard: MERGETREE_H */

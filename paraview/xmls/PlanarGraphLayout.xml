@@ -18,9 +18,17 @@ Related publication:
 'Nested Tracking Graphs'.
 Jonas Lukasczyk, Gunther Weber, Ross Maciejewski, Christoph Garth, and Heike Leitte.
 Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposium on Visualization). Vol. 36. No. 3. 2017.
+
+
+If the input is a merge tree, the filter can take the nodes output and the arc output of a FTMTree filter and will compute a planar layout specialized for merge tree.
+
+Related publication:
+
+TODO
             </Documentation>
 
-            <InputProperty name="Input" command="SetInputConnection">
+            <!-- Inputs -->
+            <InputProperty name="Input" command="AddInputConnection" multiple_input="1">
                 <ProxyGroupDomain name="groups">
                     <Group name="sources" />
                     <Group name="filters" />
@@ -32,10 +40,142 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
                 <Documentation>Graph.</Documentation>
             </InputProperty>
 
+
+           <!-- Merge Tree Planar Layout Options -->
+            <IntVectorProperty
+            name="InputIsAMergeTree"
+            command="SetInputIsAMergeTree"
+            label="Input is a Merge Tree"
+            number_of_elements="1"
+            default_values="0">
+              <Documentation>
+
+              </Documentation>
+              <BooleanDomain name="bool"/>
+            </IntVectorProperty>
+            
+            <IntVectorProperty
+            name="BranchDecompositionPlanarLayout"
+            command="SetBranchDecompositionPlanarLayout"
+            label="Branch Decomposition Planar Layout"
+            number_of_elements="1"
+            default_values="0">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+              <BooleanDomain name="bool"/>
+            </IntVectorProperty>
+            
+            <DoubleVectorProperty
+            name="BranchSpacing"
+            command="SetBranchSpacing"
+            label="Branch Spacing"
+            number_of_elements="1"
+            default_values="1">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="BranchDecompositionPlanarLayout"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+            </DoubleVectorProperty>
+            
+            <DoubleVectorProperty
+            name="ImportantPairs"
+            command="SetImportantPairs"
+            label="Important Pairs (%)"
+            number_of_elements="1"
+            default_values="10">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+              <DoubleRangeDomain name="range" min="0" max="100" />
+            </DoubleVectorProperty>
+            
+            <DoubleVectorProperty
+            name="ImportantPairsSpacing"
+            command="SetImportantPairsSpacing"
+            label="Important Pairs Spacing"
+            number_of_elements="1"
+            default_values="1">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+            </DoubleVectorProperty>
+            
+            <DoubleVectorProperty
+            name="NonImportantPairsSpacing"
+            command="SetNonImportantPairsSpacing"
+            label="Non Important Pairs Spacing"
+            number_of_elements="1"
+            default_values="0.1">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+            </DoubleVectorProperty>
+            
+            <DoubleVectorProperty
+            name="NonImportantPairsProximity"
+            command="SetNonImportantPairsProximity"
+            label="Non Important Pairs Proximity"
+            number_of_elements="1"
+            default_values="0.05">
+              <Hints>
+              <PropertyWidgetDecorator type="GenericDecorator"
+                                       mode="visibility"
+                                       property="InputIsAMergeTree"
+                                       value="1" />
+              </Hints>
+              <Documentation>
+                
+              </Documentation>
+              <DoubleRangeDomain name="range" min="0" max="1" />
+            </DoubleVectorProperty>
+
+
+            <!-- Graph Planar Layout Options -->
             <IntVectorProperty name="UseSequences" label="Use Sequences" command="SetUseSequences" number_of_elements="1" default_values="1">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
+                </Hints>
                 <BooleanDomain name="bool" />
                 <Documentation>Points are positioned along the x-axis based on a sequence (e.g., time indicies or scalar values).</Documentation>
             </IntVectorProperty>
+            
             <StringVectorProperty name="SequenceArray" label="Sequence Array" command="SetInputArrayToProcess" element_types="0 0 0 0 2" number_of_elements="5">
                 <ArrayListDomain attribute_type="Scalars" name="array_list">
                     <RequiredProperties>
@@ -44,14 +184,25 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
                 </ArrayListDomain>
                 <Hints>
                     <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseSequences" value="1" />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
                 </Hints>
                 <Documentation>Sequence Scalar Array.</Documentation>
             </StringVectorProperty>
 
             <IntVectorProperty name="UseSizes" label="Use Sizes" command="SetUseSizes" number_of_elements="1" default_values="0">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
+                </Hints>
                 <BooleanDomain name="bool" />
                 <Documentation>Points cover space on the y-axis based on their size.</Documentation>
             </IntVectorProperty>
+            
             <StringVectorProperty name="SizeArray" label="Size Array" command="SetInputArrayToProcess" element_types="0 0 0 0 2" number_of_elements="5" default_values="1">
                 <ArrayListDomain attribute_type="Scalars" name="array_list">
                     <RequiredProperties>
@@ -60,14 +211,25 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
                 </ArrayListDomain>
                 <Hints>
                     <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseSizes" value="1" />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
                 </Hints>
                 <Documentation>Size Scalar Array.</Documentation>
             </StringVectorProperty>
 
             <IntVectorProperty name="UseBranches" label="Use Branches" command="SetUseBranches" number_of_elements="1" default_values="0">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
+                </Hints>
                 <BooleanDomain name="bool" />
                 <Documentation>Points with the same branch label are positioned on straight lines.</Documentation>
             </IntVectorProperty>
+            
             <StringVectorProperty name="BranchArray" label="Branch Array" command="SetInputArrayToProcess" element_types="0 0 0 0 2" number_of_elements="5" default_values="2">
                 <ArrayListDomain attribute_type="Scalars" name="array_list">
                     <RequiredProperties>
@@ -76,14 +238,25 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
                 </ArrayListDomain>
                 <Hints>
                     <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseBranches" value="1" />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
                 </Hints>
                 <Documentation>Branch Scalar Array.</Documentation>
             </StringVectorProperty>
 
             <IntVectorProperty name="UseLevels" label="Use Levels" command="SetUseLevels" number_of_elements="1" default_values="0">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
+                </Hints>
                 <BooleanDomain name="bool" />
                 <Documentation>The layout of points with the same level label are computed individually and afterwards nested based on the level hierarchy.</Documentation>
             </IntVectorProperty>
+            
             <StringVectorProperty name="LevelArray" label="Level Array" command="SetInputArrayToProcess" element_types="0 0 0 0 2" number_of_elements="5" default_values="3">
                 <ArrayListDomain attribute_type="Scalars" name="array_list">
                     <RequiredProperties>
@@ -91,16 +264,29 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
                     </RequiredProperties>
                 </ArrayListDomain>
                 <Hints>
-                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseLevels" value="1" />
+                    <PropertyWidgetDecorator type="GenericDecorator" mode="visibility" property="UseLevels" value="1" 
+                    />
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
                 </Hints>
                 <Documentation>Level Scalar Array.</Documentation>
             </StringVectorProperty>
 
             <StringVectorProperty name="OutputArrayName" command="SetOutputArrayName" number_of_elements="1" animateable="0" label="Output Array Name" default_values="Layout">
+                <Hints>
+                    <PropertyWidgetDecorator type="GenericDecorator"
+                                             mode="visibility"
+                                             property="InputIsAMergeTree"
+                                             value="0" />
+                </Hints>
                 <Documentation>Name of the output layout array.</Documentation>
             </StringVectorProperty>
 
+            <!-- -->
             <PropertyGroup panel_widget="Line" label="Input Options">
+                <Property name="InputIsAMergeTree" />
                 <Property name="UseSequences" />
                 <Property name="SequenceArray" />
                 <Property name="UseSizes" />
@@ -113,6 +299,12 @@ Computer Graphics Forum (Special Issue, Proceedings Eurographics / IEEE Symposiu
 
             <PropertyGroup panel_widget="Line" label="Output Options">
                 <Property name="OutputArrayName" />
+                <Property name="BranchDecompositionPlanarLayout"/>
+                <Property name="BranchSpacing"/>
+                <Property name="ImportantPairs"/>
+                <Property name="ImportantPairsSpacing"/>
+                <Property name="NonImportantPairsSpacing"/>
+                <Property name="NonImportantPairsProximity"/>
             </PropertyGroup>
 
             ${DEBUG_WIDGETS}
